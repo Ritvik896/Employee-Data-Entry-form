@@ -1,0 +1,147 @@
+// Function to validate the entry made by user in User Form
+
+function validateEntry(){
+
+  //declare a variable and set the reference of active google sheet
+
+  var myGoogleSheet=SpreadsheetApp.getActiveSpreadsheet();
+
+  var shUserForm=myGoogleSheet.getSheetByName("User Form");
+
+  var ui=SpreadsheetApp.getUi(); //to create instance of the user interface to show the alert
+
+  shUserForm.getRange("C7").setBackground("#FFFFFF");//Employee ID background colour:White
+  shUserForm.getRange("C9").setBackground("#FFFFFF");//Employee Name
+  shUserForm.getRange("C11").setBackground("#FFFFFF");//Gender
+  shUserForm.getRange("C13").setBackground("#FFFFFF");//Email ID 
+  shUserForm.getRange("C15").setBackground("#FFFFFF");//Department
+  shUserForm.getRange("C17").setBackground("#FFFFFF");//Address
+
+  //Validating Employee ID
+  if(shUserForm.getRange("C7").isBlank()==true){
+    ui.alert("Please enter employee ID.");
+    shUserForm.getRange("C7").activate();
+    shUserForm.getRange("C7").setBackground("#FF0000");//Red colour
+    return false;
+
+  }
+
+  //Validating Employee name 
+  if(shUserForm.getRange("C9").isBlank()==true){
+    ui.alert("Please enter employee ID.");
+    shUserForm.getRange("C9").activate();
+    shUserForm.getRange("C9").setBackground("#FF0000");//Red colour
+    return false;
+
+  }
+
+  //Validating gender
+  if(shUserForm.getRange("C11").isBlank()==true){
+    ui.alert("Please enter gender from drop-down");
+    shUserForm.getRange("C11").activate();
+    shUserForm.getRange("C11").setBackground("#FF0000");//Red colour
+    return false;
+
+  }
+
+  //Validating Email ID
+  if(shUserForm.getRange("C13").isBlank()==true){
+    ui.alert("Please enter correct email ID");
+    shUserForm.getRange("C13").activate();
+    shUserForm.getRange("C13").setBackground("#FF0000");//Red colour
+    return false;
+
+  }
+
+  //Validating department 
+  if(shUserForm.getRange("C15").isBlank()==true){
+    ui.alert("Please enter correct department from drop-down");
+    shUserForm.getRange("C15").activate();
+    shUserForm.getRange("C15").setBackground("#FF0000");//Red colour
+    return false;
+
+  }
+
+  //Validating address
+  if(shUserForm.getRange("C17").isBlank()==true){
+    ui.alert("Please enter correct address");
+    shUserForm.getRange("C17").activate();
+    shUserForm.getRange("C17").setBackground("#FF0000");//Red colour
+    return false;
+
+  }
+
+  return true;//if there is no pending data
+}
+
+
+//Function to submit the data to the database
+
+function submitData(){
+
+  //decclare a variable and set the reference of active google sheet
+
+  var myGoogleSheet=SpreadsheetApp.getActiveSpreadsheet();
+
+  var shUserForm=myGoogleSheet.getSheetByName("User Form");
+
+  var datasheet=myGoogleSheet.getSheetByName("Database");
+
+  //to create the instance of the user interface environmnet to use the alert feature
+
+  var ui=SpreadsheetApp.getUi();
+
+  var response=ui.alert("Submit", "Do you want to submit the data?", ui.ButtonSet.YES_NO);
+
+  //checking the user response 
+
+  if(response==ui.Button.NO){
+
+    return;//to exit from the function
+  }
+
+  if(validateEntry()==true){
+
+    var blankRow=datasheet.getLastRow()+1;//getlastRow will provide the last row
+
+    //identify the next blank row, move to next blank row after the last row
+
+    //code to update data in database
+
+    datasheet.getRange(blankRow, 1).setValue(shUserForm.getRange("C7").getValue());//Employee ID,.getRange[row number, column number],getValue(val)
+
+    datasheet.getRange(blankRow, 2).setValue(shUserForm.getRange("C9").getValue());//Employee Name
+
+    datasheet.getRange(blankRow, 3).setValue(shUserForm.getRange("C11").getValue());//Gender
+
+    datasheet.getRange(blankRow, 4).setValue(shUserForm.getRange("C13").getValue());//Email ID
+
+    datasheet.getRange(blankRow, 5).setValue(shUserForm.getRange("C15").getValue());//Department Name 
+
+    datasheet.getRange(blankRow, 6).setValue(shUserForm.getRange("C17").getValue());//Address
+
+    //In submited on pass the date and time, in submitted by we need to update the email id
+
+    // Code to update the date and time
+
+    datasheet.getRange(blankRow, 7).setValue(new Date()).setNumberFormat("dd-mm-yyyy h:mm");//new date will update date
+
+    //Submitted by
+
+    datasheet.getRange(blankRow, 8).setValue(session.getActiveUser().getEmail());//DOUBT
+
+    //Alert for data transfer is complete
+
+    ui.alert("New Data Saved - Emp # " + shUserForm.getRange("C7").getValue() + '"');
+
+    //We are clearing the data from user form since the data is transferred
+    shUserForm.getRange("C7").clear();
+    shUserForm.getRange("C9").clear();
+    shUserForm.getRange("C11").clear();
+    shUserForm.getRange("C13").clear(); 
+    shUserForm.getRange("C15").clear();
+    shUserForm.getRange("C17").clear();
+  }
+
+
+}
